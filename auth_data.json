@@ -1,0 +1,9 @@
+{
+    "template_account": {
+        "comments": "", 
+        "password_hash": "bcrypt_password_hashed", 
+        "permissions": [
+            "*"
+        ]
+    }
+}
