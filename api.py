@@ -3,6 +3,7 @@ from flask_cors import CORS
 from datetime import datetime, timedelta
 from utils.auth import Auth
 from utils.data import Data
+from utils.color import Color
 import hashlib
 import pytz
 import time
@@ -14,6 +15,7 @@ CORS(app, supports_credentials=True)
 
 data = Data()
 auth = Auth(data)
+color_selector = Color()
 
 tz = pytz.timezone('America/Los_Angeles')
 pst_now = datetime.now(tz)
@@ -296,6 +298,33 @@ def data_full_data():
         d['error'] = 'noPermission'
         d['success'] = False
         d['data'] = {}
+    return jsonify(d)
+
+
+
+###Team Color Regulation###
+@app.route('/api/v3/checkin_client/color_selector', methods=['POST'])
+def checkin_client_color_selector():
+    json = request.get_json(force=True)
+    d = {}
+    username = session['username']
+    color_group = request.json.get('color_group', 'sparks')
+    if auth.has_permission(username, []):
+        d['error'] = 'none'
+        d['success'] = True
+        if color_group == 'sparks':
+            d['color'] = color_selector.select_color_sparks()
+        elif color_group == 'tnt':
+            d['color'] = color_selector.select_color_tnt()
+        else:
+            d['error'] = 'invalidArgs'
+            d['success'] = False
+            d['color'] = 'Unknown'
+    else:
+        d['error'] = 'noPermission'
+        d['success'] = False
+        d['color'] = 'Unknown'
+    d['color_group'] = color_group
     return jsonify(d)
 
 
